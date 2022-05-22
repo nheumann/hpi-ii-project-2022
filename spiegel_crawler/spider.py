@@ -64,7 +64,7 @@ class SpiegelSpider(scrapy.Spider):
         article.content = content
         article.url = response.url
         article.source = SPIEGEL
-        article.date = response.css('header .timeformat::attr(datetime)').get()
+        article.date = response.css('meta[name=date]::attr(content)').get()
 
         #log.info(f"Done parsing article {article}")
 
