@@ -55,8 +55,8 @@ class SpiegelProducer:
         if err is not None:
             log.error("Delivery failed for User record {}: {}".format(msg.key(), err))
             return
-        log.info(
-            "User record {} successfully produced to {} [{}] at offset {}".format(
-                msg.key(), msg.topic(), msg.partition(), msg.offset()
-            )
-        )
+        #log.info(
+        #    "User record {} successfully produced to {} [{}] at offset {}".format(
+        #        msg.key(), msg.topic(), msg.partition(), msg.offset()
+        #    )
+        #)

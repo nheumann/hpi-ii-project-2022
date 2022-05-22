@@ -17,17 +17,20 @@ class SpiegelSpider(scrapy.Spider):
     )
 
     def __init__(self, start_date: datetime):
-
         self.date = start_date
         self.producer = SpiegelProducer()
+        self.logger.setLevel(logging.INFO)
+
+        logging.getLogger('scrapy.core.engine').setLevel(logging.WARNING)
+
 
     def start_requests(self):
         url = f"https://www.spiegel.de/nachrichtenarchiv/artikel-{datetime.strftime(self.date, '%d.%m.%Y')}.html"
-        log.info(f"Extracting from {url}")
+        #log.info(f"Extracting from {url}")
         yield scrapy.Request(url=url, callback=self.parseDateOverview)
 
     def parseDateOverview(self, response):
-        log.info(f"Parsing date overview {response.url}")
+        self.logger.info(f"Parsing date overview {response.url}")
         links = self.articleLinkExtractor.extract_links(response)
 
         # Crawl all found articles
@@ -40,7 +43,7 @@ class SpiegelSpider(scrapy.Spider):
         yield scrapy.Request(next_page, callback=self.parseDateOverview)
 
     def parseArticle(self, response):
-        log.info(f"Parsing article {response.url}")
+        #log.info(f"Parsing article {response.url}")
 
         title = response.css('article::attr(aria-label)').get()
         content = "\n".join(response.xpath('//*[contains(concat(" ",normalize-space(@class)," ")," RichText ")]//text()').getall())
@@ -48,7 +51,12 @@ class SpiegelSpider(scrapy.Spider):
         # remove duplicate line breaks from content
         content = re.sub('\\n( |\\n)*\\n', '\n', content)
 
-        id = 'spiegel_' + re.search('([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})', response.url).group(0)
+        uuid_match = re.search('([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})', response.url)
+        id_match = re.search('([0-9]+)\.html', response.url)
+        if(uuid_match):
+            id = 'spiegel_' + uuid_match.group(0)
+        else:
+            id = 'spiegel_' + id_match.group(0)
 
         article = Article()
         article.id = id
@@ -58,7 +66,7 @@ class SpiegelSpider(scrapy.Spider):
         article.source = SPIEGEL
         article.date = response.css('header .timeformat::attr(datetime)').get()
 
-        log.info(f"Done parsing article {article}")
+        #log.info(f"Done parsing article {article}")
 
         self.producer.produce_to_topic(article=article)
 
