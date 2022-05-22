@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package bakdata.articles;
+
+message Article {
+  string id = 1;
+  string title = 2;
+  string content = 3;
+  string url = 4;
+  Source source = 6;
+  string date = 5;
+}
+
+enum Source {
+  OTHER = 0;
+  SPIEGEL = 1;
+}

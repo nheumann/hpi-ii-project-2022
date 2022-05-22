@@ -46,7 +46,7 @@ class RbExtractor:
     def send_request(self) -> str:
         url = f"https://www.handelsregisterbekanntmachungen.de/skripte/hrb.php?rb_id={self.rb_id}&land_abk={self.state}"
         # For graceful crawling! Remove this at your own risk!
-        sleep(0.5)
+        sleep(0.3)
         return requests.get(url=url).text
 
     @staticmethod
