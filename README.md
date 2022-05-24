@@ -1,5 +1,7 @@
 # HPI information integration project SoSe 2022
 
+**!!! readme for exercise 2 at the end**
+
 This repository provides a code base for the information integration course in the summer semester of 2022. Below you
 can find the documentation for setting up the project.
 
@@ -171,3 +173,23 @@ You can stop and remove all the resources by running:
 ```shell
 docker-compose down
 ```
+
+## Readme for exercise 2
+
+Basically, our crawler for the second dataset is using the same logic, principles and file structure as the one for the Handelsregisterdaten. Therefore, the same command structure can be used:
+
+```shell
+poetry run python spiegel_crawler/main.py --date 2022-05-24
+```
+
+As the Spiegel-Website has a different structure, the parameter needs to be `date`. The crawler then gathers all articles from spiegel.de, starting from the given date and then backwards in time, until you cancel.
+
+### Structure of the spiegel crawler
+
+In difference to the Handelsregister-crawler, we're using scrapy to crawl the Spiegel-Website. Spiegel has a overview page of all articles on the given date (https://www.spiegel.de/nachrichtenarchiv/artikel-24.05.2022.html), from which we can extract the article-links. Afterwards, all articles are crawled and then the overview for the day before and so on.
+
+On the overview page and the article we can extract the information based on the html structure by the `<article>`-tag and given CSS classes.
+
+### Schema of the spiegel crawler
+
+We also build an protobuf-schema for inserting the data into the Kafka topic, which you can find in the `proto/bakdata/articles/article.proto` file. It is independent of the Spiegel-Website and can also be used for different news sites in the future.
